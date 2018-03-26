@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            text-decoration: none;
+        }
+        body{
+            padding: 20px;
+        }
+        #container{
+            position: relative;
+            width:1640px;
+            height: 800px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+        #list{
+            position:absolute;
+            z-index: 1;
+            width: 13440px;
+            height: 800px;
+        }
+        #list img{
+            float: left;
+            width: 1640px;
+            height: 800px;
+        }
+        #buttons{
+            position: absolute;
+            left:750px;
+            bottom: 20px;
+            z-index: 2;
+            height: 10px;
+            width: 150px;
+        }
+        #buttons span{
+            float: left;
+            margin-right: 5px;
+            width: 10px;
+            height: 10px;
+            border: 1px solid #fff;
+            border-radius: 50%;
+            background: #333;
+            cursor: pointer;
+        }
+        #buttons .on{
+            background: orangered;
+        }
+        .arrow{
+            position: absolute;
+            top: 350px;
+            z-index: 2;
+            display: none;
+            width: 60px;
+            height: 60px;
+            font-size: 50px;           
+            line-height: 55px;
+            text-align: center;
+            color: #fff;
+            background: rgba(0,0,0,.3);
+            cursor: pointer;
+        }
+        .arrow:hover{
+            background: rgba(0,0,0,.7);
+        }
+        #container:hover .arrow{
+            display: block;
+        }
+        #prev{
+            left: 20px;
+        }
+        #next{
+            right:20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="list" style="left: -1640px">
+            <img src="img/6.jpg" alt="1">
+            <img src="img/1.jpg" alt="1">
+            <img src="img/2.jpg" alt="2">
+            <img src="img/3.jpg" alt="3">
+            <img src="img/4.jpg" alt="4">
+            <img src="img/5.jpg" alt="5">
+            <img src="img/6.jpg" alt="6">
+            <img src="img/1.jpg" alt="6">
+        </div>
+        <div id="buttons">
+            <span index= "1" class="on"></span>
+            <span index="2"></span>
+            <span index="3"></span>
+            <span index="4"></span>
+            <span index="5"></span>
+            <span index="6"></span>
+        </div>
+        <a href="javascript:;" id="prev" class="arrow">&lt;</a>
+        <a href="javascript:;" id="next" class="arrow">&gt;</a>
+    </div>
+    <script>
+        window.onload = function(){
+            var list = document.getElementById('list');
+            var prev = document.getElementById('prev');
+            var next = document.getElementById('next');
+            var container = document.getElementById('container');
+            var timer;
+            var buttons = document.getElementById('buttons').getElementsByTagName('span');
+            var index = 1;
+            function animate(offset){
+                //获取的是style。left，是相对左边获取距离，所以第一张图后style。left都为负值
+                //且style。left获取的是字符串，需要用parseInt（）取整转化为数字
+                var newLeft = parseInt(list.style.left) + offset;
+                list.style.left = newLeft + 'px';
+
+                if(newLeft > -1640){
+                    list.style.left = -9840 + 'px';
+                }
+                if(newLeft < -9840){
+                    list.style.left = -1640 + 'px';
+                }
+            }
+          //自动轮播
+            function play(){
+                timer = setInterval(function(){
+                    next.onclick();
+                },1500)
+            }
+            play();
+           //鼠标放上去停止轮播，清空timer计时器
+            function stop(){
+                clearInterval(timer);
+            }
+            container.onmouseover = stop;
+            container.onmouseout = play;          
+
+            function buttonsShow(){
+                //清除之前的样式
+                for(let i = 0; i < buttons.length; i++){
+                    if(buttons[i].className == 'on'){
+                        buttons[i].className = '';
+                    }
+                }
+                //数组从0开始
+                buttons[index - 1].className = 'on'
+            }
+            function cursorBtnShow(){
+                for(let i = 0; i < buttons.length; i++){
+                    buttons[i].onclick = function(){
+                        //偏移量获取：获得鼠标移动到小圆点的位置，用this把index绑定到对象buttons[i]上
+                        //由于index是自定义属性，需要用到getAttribute获取index
+                        var clickIndex = parseInt(this.getAttribute('index'));
+                        var offset = 1640 * (index - clickIndex);
+                        animate(offset);
+                        index = clickIndex;
+                        buttonsShow();
+                    }
+                }
+            }
+            cursorBtnShow();
+            prev.onclick = function(){
+                index -= 1;
+                if(index < 1){
+                    index = 6;
+                }
+                buttonsShow();
+                animate(1640);
+            }
+            next.onclick = function(){
+                index += 1;
+                if(index > 6){
+                    index = 1;
+                }
+                buttonsShow();
+                animate(-1640);
+            }
+        }
+    </script>
+</body>
+</html>
